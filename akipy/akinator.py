@@ -122,6 +122,29 @@ class Akinator:
                 self.__update(action="back", resp=resp)
             except Exception as e:
                 raise e
+            
+    def exclude(self):
+        url = f"{self.uri}/exclude"
+        data = {
+            "step": self.step,
+            "progression": self.progression,
+            "sid": self.theme,
+            "cm": str(self.child_mode).lower(),
+            "session": self.session,
+            "signature": self.signature,
+        }
+
+        try:
+            req = request_handler(url=url, method='POST', data=data)
+            resp = json.loads(req.text)
+
+            if re.findall(r"id_proposition", str(resp)):
+                self.__update(action="win", resp=resp)
+            else:
+                self.__update(action="answer", resp=resp)
+            self.completion = resp['completion']
+        except Exception as e:
+            raise e
 
     def __update(self, action: str, resp):
         if action == "answer":
